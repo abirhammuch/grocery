@@ -128,62 +128,64 @@ export const placeOrderStripe = async (req, res) => {
 // stripe webhooks to verify payment action  : /stripe
 // stripe webhooks to verify payment action : /stripe
 export const stripeWebhooks = async (request, response) => {
-    // Stripe Gateway initialize
+    console.log("=== WEBHOOK HIT ===");
+    console.log("Time:", new Date().toISOString());
+    console.log("Event type from Stripe will be logged after verification");
+    
     const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
-
-    const sig = request.headers["stripe-signature"]; // FIXED: should be "stripe-signature" not "stripe_signature"
+    const sig = request.headers["stripe-signature"];
 
     let event;
 
     try {
+        const rawBody = request.body;
+        console.log("Raw body length:", rawBody?.length || 0);
+        
         event = stripeInstance.webhooks.constructEvent(
-            request.body,
+            rawBody,
             sig,
             process.env.STRIPE_WEBHOOK_SECRET
         );
+        console.log("✅ Event verified:", event.type);
+        console.log("Full event data:", JSON.stringify(event.data.object, null, 2).substring(0, 500));
     } catch (error) {
-        console.error("Webhook signature verification failed:", error.message);
+        console.error("❌ Webhook error:", error.message);
         return response.status(400).send(`Webhook Error: ${error.message}`);
     }
 
-    // Handle the event
-    switch (event.type) {
-        case "checkout.session.completed": {  // FIXED: Use this event instead of payment_intent_succeeded
-            const session = event.data.object;
-            
-            // Get metadata from the session directly
-            const { orderId, userId } = session.metadata;
-            
-            console.log(`Webhook: Payment successful for order ${orderId}`);
-            
-            // Mark payment as paid
-            await Order.findByIdAndUpdate(orderId, { isPaid: true });
-            
-            // Clear user cart
-            await User.findByIdAndUpdate(userId, { cartItems: {} });
-            
-            console.log(`Webhook: Cart cleared for user ${userId}`);
-            break;
+    if (event.type === "checkout.session.completed") {
+        console.log("🎉 Processing checkout.session.completed");
+        const session = event.data.object;
+        const { orderId, userId } = session.metadata || {};
+        
+        console.log("Metadata received:", { orderId, userId });
+        
+        if (!orderId || !userId) {
+            console.error("❌ Missing metadata! Session metadata:", session.metadata);
+            return response.status(400).json({ received: false, error: "Missing metadata" });
         }
-        case "checkout.session.expired": {
-            const session = event.data.object;
-            const { orderId } = session.metadata;
+
+        try {
+            // Update order
+            const updateResult = await Order.findByIdAndUpdate(orderId, { isPaid: true });
+            console.log("Order update result:", updateResult ? "Success" : "Order not found");
             
-            console.log(`Webhook: Checkout expired for order ${orderId}`);
+            // Clear cart
+            const userUpdateResult = await User.findByIdAndUpdate(userId, { cartItems: {} });
+            console.log("Cart clear result:", userUpdateResult ? "Success" : "User not found");
             
-            // Delete the unpaid order
-            await Order.findByIdAndDelete(orderId);
-            break;
+            console.log("✅ Cart cleared successfully!");
+        } catch (dbError) {
+            console.error("❌ Database error:", dbError.message);
+            return response.status(500).json({ received: false, error: dbError.message });
         }
-        default:
-            console.log(`Unhandled event type ${event.type}`);
-            break;
+    } else {
+        console.log(`⚠️ Ignoring event type: ${event.type}`);
     }
     
-    // Send response immediately
     response.json({ received: true });
+    console.log("=== WEBHOOK FINISHED ===");
 }
-
 
 
 
