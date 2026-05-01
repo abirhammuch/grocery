@@ -12,45 +12,66 @@ import addressRouter from './routes/addressRoute.js';
 import orderRouter from './routes/orderRoute.js';
 import { stripeWebhooks } from './controllers/orderController.js';
 
-
-
 const app = express();
 const port = process.env.PORT || 4000;
 
 await connectDB()
 await connectCloudinary()
 
-//allowed multiple origines
+// Allowed origins
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
-    'https://grocery-neon-kappa.vercel.app',  // ← YOUR FRONTEND URL
+    'https://grocery-neon-kappa.vercel.app',
     'https://grocery-backend-livid-six.vercel.app',
-    /\.vercel\.app$/  // Allow all vercel.app subdomains
 ]
 
-
+// Webhook MUST come before express.json()
 app.post('/stripe', express.raw({type: 'application/json'}), stripeWebhooks)
 
-//Middleware configration
+// ✅ FIXED CORS configuration
+app.use(cors({
+    origin: function(origin, callback) {
+        // Allow requests with no origin
+        if (!origin) return callback(null, true);
+        
+        // Check exact matches
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        
+        // Allow any vercel.app subdomain
+        if (origin.match(/^https?:\/\/.*\.vercel\.app$/)) {
+            return callback(null, true);
+        }
+        
+        console.log('❌ CORS blocked:', origin);
+        callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
+}));
+
+// Middleware configuration
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({origin:allowedOrigins, credentials:true}));
 
+// Debug middleware
 app.use((req, res, next) => {
-  console.log("REQUEST:", req.method, req.url);
-  next();
+    console.log("REQUEST:", req.method, req.url);
+    console.log("Origin:", req.headers.origin);
+    next();
 });
 
-app.get('/', (req, res)=>res.send("API is working"));
-app.use('/api/user', userRouter)
-app.use('/api/seller', sellerRouter)
-app.use('/api/product', productRouter)
-app.use('/api/cart', cartRouter)
-app.use('/api/address', addressRouter)
-app.use('/api/order', orderRouter)
+app.get('/', (req, res) => res.send("API is working"));
+app.use('/api/user', userRouter);
+app.use('/api/seller', sellerRouter);
+app.use('/api/product', productRouter);
+app.use('/api/cart', cartRouter);
+app.use('/api/address', addressRouter);
+app.use('/api/order', orderRouter);
 
-
-app.listen(port, ()=>{
-  console.log(`Server is running on http://localhost:${port}`)
-})
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`)
+});
