@@ -4,7 +4,7 @@ import Address from "../models/Address.js";
 export const addAddress = async (req, res) => {
   try {
     const { address } = req.body;
-    const userId = req.userId || req.user?.id;
+    const userId = req.user?.id;
 
     if (!userId) {
       return res
@@ -27,7 +27,7 @@ export const addAddress = async (req, res) => {
 //get address  /api/address/get
 export const getAddress = async (req, res) => {
   try {
-    const userId = req.userId || req.user?.id;
+    const userId = req.user?.id;
 
     if (!userId) {
       return res
