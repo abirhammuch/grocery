@@ -1,18 +1,13 @@
-import User from "../models/User.js"
-
+import User from "../models/User.js";
 
 // Update User CartData : /api/cart/update
-export const updateCart = async (req , res) =>{
-
-  
+export const updateCart = async (req, res) => {
   try {
-    const { cartItems } = req.body
-    await User.findByIdAndUpdate(req.user.id, { cartItems,  })
-    res.json({success: true, message: "Cart updated"})
-    
+    const { cartItems } = req.body;
+    await User.findByIdAndUpdate(req.userId, { cartItems });
+    res.json({ success: true, message: "Cart updated" });
   } catch (error) {
     console.log(error.message);
-      res.json({ success: false, message: error.message });
+    res.json({ success: false, message: error.message });
   }
-}
-
+};
