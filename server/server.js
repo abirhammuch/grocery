@@ -30,29 +30,16 @@ const allowedOrigins = [
 app.post('/stripe', express.raw({type: 'application/json'}), stripeWebhooks)
 
 // ✅ FIXED CORS configuration
+// Remove your current CORS config and replace with this
 app.use(cors({
-    origin: function(origin, callback) {
-        // Allow requests with no origin
-        if (!origin) return callback(null, true);
-        
-        // Check exact matches
-        if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        }
-        
-        // Allow any vercel.app subdomain
-        if (origin.match(/^https?:\/\/.*\.vercel\.app$/)) {
-            return callback(null, true);
-        }
-        
-        console.log('❌ CORS blocked:', origin);
-        callback(new Error('Not allowed by CORS'));
-    },
+    origin: 'https://grocery-neon-kappa.vercel.app',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
 }));
 
+// Handle preflight requests
+app.options('*', cors());
 // Middleware configuration
 app.use(express.json());
 app.use(cookieParser());
