@@ -29,6 +29,7 @@ export const register = async (req, res) => {
       httpOnly: true, // prevent java script to access cookie
       secure: process.env.NODE_ENV === "production", // use secure cookie in production
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", //csrf protection
+      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days cookie expiration time
     });
     return res.json({
@@ -72,6 +73,7 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return res.json({
