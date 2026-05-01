@@ -21,7 +21,13 @@ await connectDB()
 await connectCloudinary()
 
 //allowed multiple origines
-const allowedOrigins = ['http://localhost:5173', 'https://grocery-backend-livid-six.vercel.app']
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://grocery-neon-kappa.vercel.app',  // ← YOUR FRONTEND URL
+    'https://grocery-backend-livid-six.vercel.app',
+    /\.vercel\.app$/  // Allow all vercel.app subdomains
+]
 
 
 app.post('/stripe', express.raw({type: 'application/json'}), stripeWebhooks)
