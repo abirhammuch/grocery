@@ -39,7 +39,7 @@ app.use(cors({
 }));
 
 // Handle preflight requests
-app.options('*', cors());
+// app.options('*', cors());  // Removed this line as it's causing an error and is redundant
 // Middleware configuration
 app.use(express.json());
 app.use(cookieParser());
@@ -59,6 +59,12 @@ app.use('/api/cart', cartRouter);
 app.use('/api/address', addressRouter);
 app.use('/api/order', orderRouter);
 
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`)
-});
+// Export the app for Vercel serverless functions
+export default app;
+
+// Only listen when running locally (not on Vercel)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    app.listen(port, () => {
+        console.log(`Server is running on http://localhost:${port}`)
+    });
+}
