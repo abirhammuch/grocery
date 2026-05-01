@@ -8,7 +8,7 @@ import { AppContextProvider } from './context/AppContext.jsx'
 
 // ✅ ADD THIS LINE - fixes all 401 errors
 axios.defaults.withCredentials = true
-axios.defaults.baseURL = 'https://grocery-backend-livid-six.vercel.app/api'
+axios.defaults.baseURL = 'https://grocery-backend-livid-six.vercel.app'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
