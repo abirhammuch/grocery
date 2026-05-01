@@ -19,6 +19,7 @@ const authUser = (req, res, next) => {
 
     if (decoded.id) {
       req.userId = decoded.id;
+      req.user = { id: decoded.id };
       next();
     } else {
       return res.status(401).json({

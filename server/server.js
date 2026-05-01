@@ -48,7 +48,8 @@ app.use(
 );
 
 // Handle preflight requests
-// app.options('*', cors());  // Removed this line as it's causing an error and is redundant
+//
+ app.options('*', cors());  // Removed this line as it's causing an error and is redundant
 // Middleware configuration
 app.use(express.json());
 app.use(cookieParser());
