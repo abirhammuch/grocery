@@ -25,16 +25,10 @@ export const register = async (req, res) => {
       expiresIn: "7d",
     });
 
-    res.cookie("token", token, {
-      httpOnly: true, // prevent java script to access cookie
-      secure: process.env.NODE_ENV === "production", // use secure cookie in production
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", //csrf protection
-      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days cookie expiration time
-    });
     return res.json({
       success: true,
       user: { email: user.email, name: user.name },
+      token,
     });
   } catch (error) {
     console.log(error.message);
@@ -69,16 +63,10 @@ export const login = async (req, res) => {
       expiresIn: "7d",
     });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
     return res.json({
       success: true,
       user: { email: user.email, name: user.name },
+      token,
     });
   } catch (error) {
     console.log(error.message);
@@ -90,19 +78,19 @@ export const login = async (req, res) => {
 // check auth : /api/user/is-auth
 export const isAuth = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('-password');
-    
+    const user = await User.findById(req.userId).select("-password");
+
     if (!user) {
       return res.json({ success: false, message: "User not found" });
     }
-    
-    return res.json({ 
-      success: true, 
-      user: { 
-        email: user.email, 
-        name: user.name, 
-        _id: user._id 
-      } 
+
+    return res.json({
+      success: true,
+      user: {
+        email: user.email,
+        name: user.name,
+        _id: user._id,
+      },
     });
   } catch (error) {
     console.log(error.message);

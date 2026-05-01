@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import axios from 'axios';
 
-axios.defaults.withCredentials = true;
-axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
 
 // Create context
 const AppContext = createContext();
@@ -20,6 +19,41 @@ export const AppContextProvider = ({ children }) => {
     const [products, setProducts] = useState([]);
     const [cartItems, setCartItems] = useState({});
     const [searchQuery, setSearchQuery] = useState({});
+    
+    const authTokenKey = 'token';
+    const sellerTokenKey = 'sellerToken';
+
+    const setAuthToken = (token) => {
+        if (token) {
+            localStorage.setItem(authTokenKey, token);
+            axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+        } else {
+            localStorage.removeItem(authTokenKey);
+            delete axios.defaults.headers.common.Authorization;
+        }
+    };
+
+    const setSellerToken = (token) => {
+        if (token) {
+            localStorage.setItem(sellerTokenKey, token);
+            axios.defaults.headers.common['x-seller-token'] = token;
+        } else {
+            localStorage.removeItem(sellerTokenKey);
+            delete axios.defaults.headers.common['x-seller-token'];
+        }
+    };
+
+    const clearAuth = () => {
+        setAuthToken(null);
+        setSellerToken(null);
+    };
+
+    useEffect(() => {
+        const token = localStorage.getItem(authTokenKey);
+        const sellerToken = localStorage.getItem(sellerTokenKey);
+        if (token) setAuthToken(token);
+        if (sellerToken) setSellerToken(sellerToken);
+    }, []);
 
     const normalizeProduct = (product) => ({
         ...product,
@@ -173,7 +207,10 @@ export const AppContextProvider = ({ children }) => {
         getCartCount,
         axios,
         fetchProducts,
-        setCartItems
+        setCartItems,
+        setAuthToken,
+        setSellerToken,
+        clearAuth
     };
     
     return (

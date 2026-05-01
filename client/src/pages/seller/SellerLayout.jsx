@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 
 const SellerLayout = () => {
 
-    const {setIsSeller, axios, navigate} = useAppContext()
+    const {setIsSeller, axios, navigate, setSellerToken} = useAppContext()
 
     
 
@@ -25,6 +25,7 @@ const SellerLayout = () => {
         const { data } = await axios.get('/api/seller/logout');
         if(data.success){
             toast.success(data.message)
+            setSellerToken(null);
             setIsSeller(false)
             navigate('/')
         }

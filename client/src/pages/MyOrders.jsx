@@ -11,10 +11,7 @@ const MyOrders = () => {
         
         try {
             setLoading(true);
-            // IMPORTANT: Send userId as query parameter
-            const { data } = await axios.get(`/api/order/user?userId=${user._id}`, {
-                withCredentials: true
-            });
+            const { data } = await axios.get(`/api/order/user?userId=${user._id}`);
             
             console.log("Orders response:", data); // Debug
             
