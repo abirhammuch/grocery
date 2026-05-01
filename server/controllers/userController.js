@@ -87,13 +87,23 @@ export const login = async (req, res) => {
 };
 
 // check auth : /api/user/is-auth
+// check auth : /api/user/is-auth
 export const isAuth = async (req, res) => {
   try {
-    const token = req.cookies.token;
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-
-    return res.json({ success: true, user });
+    const user = await User.findById(req.userId).select('-password');
+    
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+    
+    return res.json({ 
+      success: true, 
+      user: { 
+        email: user.email, 
+        name: user.name, 
+        _id: user._id 
+      } 
+    });
   } catch (error) {
     console.log(error.message);
     return res.json({ success: false, message: error.message });
