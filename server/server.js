@@ -43,13 +43,12 @@ app.use(
     origin: "https://grocery-neon-kappa.vercel.app",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Cookie", "x-seller-token"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
   }),
 );
 
 // Handle preflight requests
-//
- app.options('*', cors());  // Removed this line as it's causing an error and is redundant
+// app.options('*', cors());  // Removed this line as it's causing an error and is redundant
 // Middleware configuration
 app.use(express.json());
 app.use(cookieParser());
