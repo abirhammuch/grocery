@@ -183,7 +183,7 @@ const Navbar2 = () => {
               </NavLink>
             )}
             <NavLink
-              to="/"
+              to="/contact"
               onClick={() => {
                 setOpen(false);
               }}
