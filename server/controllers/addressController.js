@@ -1,44 +1,52 @@
 import Address from "../models/Address.js";
 
-// ADd adress    /api/address/add
+// Add address    /api/address/add
 export const addAddress = async (req, res) => {
-  try {
-    const { address } = req.body;
-    const userId = req.user?.id;
+    try {
+        const { address } = req.body;
+        // ✅ Try both formats
+        const userId = req.user?.id || req.userId || req.body.userId;
 
-    if (!userId) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Not Authorized" });
+        console.log("Add address - User ID:", userId);
+
+        if (!userId) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Not Authorized - User ID missing" 
+            });
+        }
+
+        const newAddress = await Address.create({ ...address, userId });
+        res.json({
+            success: true,
+            message: "Address successfully added",
+            address: newAddress,
+        });
+    } catch (error) {
+        console.log(error.message);
+        res.json({ success: false, message: error.message });
     }
-
-    const newAddress = await Address.create({ ...address, userId });
-    res.json({
-      success: true,
-      message: "Address succcessfuly added",
-      address: newAddress,
-    });
-  } catch (error) {
-    console.log(error.message);
-    res.json({ success: false, message: error.message });
-  }
 };
 
-//get address  /api/address/get
+// Get address  /api/address/get
 export const getAddress = async (req, res) => {
-  try {
-    const userId = req.user?.id;
+    try {
+        // ✅ Try both formats
+        const userId = req.user?.id || req.userId || req.query.userId;
 
-    if (!userId) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Not Authorized" });
+        console.log("Get address - User ID:", userId);
+
+        if (!userId) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Not Authorized - User ID missing" 
+            });
+        }
+
+        const addresses = await Address.find({ userId }).sort({ createdAt: -1 });
+        res.json({ success: true, addresses });
+    } catch (error) {
+        console.log(error.message);
+        res.json({ success: false, message: error.message });
     }
-
-    const addresses = await Address.find({ userId }).sort({ createdAt: -1 });
-    res.json({ success: true, addresses });
-  } catch (error) {
-    console.log(error.message);
-    res.json({ success: false, message: error.message });
-  }
 };
