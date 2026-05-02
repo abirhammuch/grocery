@@ -49,21 +49,21 @@ const Contact = () => {
                             <FaPhone className="text-primary text-xl" />
                             <div>
                                 <p className="font-semibold">Phone</p>
-                                <p className="text-gray-600">+1 (555) 123-4567</p>
+                                <p className="text-gray-600">+2 (51) 973-769-266</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
                             <FaEnvelope className="text-primary text-xl" />
                             <div>
                                 <p className="font-semibold">Email</p>
-                                <p className="text-gray-600">support@grocery.com</p>
+                                <p className="text-gray-600">abirhammuch@gmail.com</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
                             <FaMapMarkerAlt className="text-primary text-xl" />
                             <div>
                                 <p className="font-semibold">Address</p>
-                                <p className="text-gray-600">123 Grocery Street, Food City, FC 12345</p>
+                                <p className="text-gray-600">123 Grocery Street, Bahir Dar City, Ethiopia</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
