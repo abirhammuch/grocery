@@ -114,14 +114,14 @@ const Contact = () => {
                             <FaEnvelope className="text-primary text-xl" />
                             <div>
                                 <p className="font-semibold">Email</p>
-                                <p className="text-gray-600">abirhammuch@gmail.com</p>
+                                <p className="text-gray-600">abirhammuch526@gmail.com</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
                             <FaMapMarkerAlt className="text-primary text-xl" />
                             <div>
                                 <p className="font-semibold">Address</p>
-                                <p className="text-gray-600">123 Grocery Street, Bahir Dar City, Ethiopia</p>
+                                <p className="text-gray-600">Poly Street, Bahir Dar City, Ethiopia</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
