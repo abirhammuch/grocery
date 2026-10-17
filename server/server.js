@@ -24,25 +24,24 @@ try {
   process.exit(1); // Exit if connections fail
 }
 
-// Allowed origins
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
   "https://grocery-neon-kappa.vercel.app",
+  "https://grocery-gray-psi.vercel.app",
   "https://grocery-backend-livid-six.vercel.app",
+  ...(process.env.CORS_ORIGINS || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
 ];
 
 // Webhook MUST come before express.json()
 app.post("/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
 
-// ✅ FIXED CORS configuration
-// Remove your current CORS config and replace with this
-// ✅ FIXED CORS configuration
-// ✅ FIXED CORS configuration - ADD x-seller-token
-// ✅ FIXED CORS configuration
 app.use(
   cors({
-    origin: "https://grocery-neon-kappa.vercel.app",
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Cookie", "x-seller-token"],
