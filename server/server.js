@@ -15,15 +15,6 @@ import { stripeWebhooks } from "./controllers/orderController.js";
 const app = express();
 const port = process.env.PORT || 4000;
 
-try {
-  await connectDB();
-  await connectCloudinary();
-  console.log("All connections established successfully");
-} catch (error) {
-  console.error("Failed to connect to services:", error.message);
-  process.exit(1); // Exit if connections fail
-}
-
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
@@ -36,9 +27,6 @@ const allowedOrigins = [
     .filter(Boolean),
 ];
 
-// Webhook MUST come before express.json()
-app.post("/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
-
 app.use(
   cors({
     origin: allowedOrigins,
@@ -47,6 +35,23 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "Cookie", "x-seller-token"],
   }),
 );
+
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    await connectCloudinary();
+    next();
+  } catch (error) {
+    console.error("Failed to connect to services:", error);
+    res.status(503).json({
+      success: false,
+      message: "Service temporarily unavailable",
+    });
+  }
+});
+
+// Keep the webhook's raw body parser ahead of express.json().
+app.post("/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
 
 // Handle preflight requests
 // app.options('*', cors());  // Removed this line as it's causing an error and is redundant
