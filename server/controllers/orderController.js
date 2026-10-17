@@ -6,7 +6,8 @@ import User from '../models/User.js'
 // Place order COD : /api/order/cod
 export const placeOrderCOD = async (req, res) => {
     try {
-        const { userId, items, addressId } = req.body; // Changed 'address' to 'addressId'
+        const { items, addressId } = req.body;
+        const userId = req.userId;
         
         console.log("Order request:", { userId, items, addressId }); // Debug
         
@@ -49,7 +50,8 @@ export const placeOrderCOD = async (req, res) => {
 // Place order using stripe : /api/order/stripe
 export const placeOrderStripe = async (req, res) => {
     try {
-        const { userId, items, addressId } = req.body;
+        const { items, addressId } = req.body;
+        const userId = req.userId;
         const { origin } = req.headers;
         
         if (!addressId || !items || items.length === 0) {
